@@ -3,8 +3,9 @@ from typing import List
 from fastapi import APIRouter, FastAPI, Request
 from pydantic import BaseModel
 
-from service.api.exceptions import UserNotFoundError
+from service.api.exceptions import ModelNotFoundError, UserNotFoundError
 from service.log import app_logger
+from service.ml_models import Random
 
 
 class RecoResponse(BaseModel):
@@ -18,15 +19,35 @@ router = APIRouter()
 @router.get(
     path="/health",
     tags=["Health"],
+    summary="Health Check",
+    response_description="Check if the API is healthy",
+    responses={
+        200: {"description": "API is healthy"},
+    },
 )
 async def health() -> str:
-    return "I am alive"
+    return "API is healthy"
 
 
 @router.get(
     path="/reco/{model_name}/{user_id}",
     tags=["Recommendations"],
     response_model=RecoResponse,
+    response_description="Get recommendations for a user based on a model",
+    responses={
+        200: {
+            "description": "Successful response",
+            "content": {
+                "application/json": {
+                    "example": {"user_id": 111, "items": [334, 343, 324, 656, 6785, 345, 1242, 34534, 234, 23]}
+                }
+            },
+        },
+        404: {
+            "description": "Model not found",
+            "content": {"application/json": {"example": {"detail": "Model not found"}}},
+        },
+    },
 )
 async def get_reco(
     request: Request,
@@ -35,7 +56,10 @@ async def get_reco(
 ) -> RecoResponse:
     app_logger.info(f"Request for model: {model_name}, user_id: {user_id}")
 
-    # Write your code here
+    if model_name == "random":
+        reco = Random().predict([[user_id]])
+    else:
+        raise ModelNotFoundError(error_message=f"Model {model_name} not found")
 
     if user_id > 10**9:
         raise UserNotFoundError(error_message=f"User {user_id} not found")
