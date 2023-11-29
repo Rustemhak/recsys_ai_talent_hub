@@ -1,3 +1,4 @@
+import dill
 from typing import List
 
 from fastapi import APIRouter, FastAPI, Request
@@ -6,7 +7,18 @@ from pydantic import BaseModel
 from service.api.exceptions import ModelNotFoundError, UserNotFoundError
 from service.log import app_logger
 from service.ml_models import Random
+from config.config_models import UserKnn_model_conf, Popular_model_conf
+# Init models
 
+model_knn = None
+with open("data/weights/userknn_tfidf_50.dill", "rb") as f:
+    model_knn = dill.load(f)
+
+model_popular = None
+with open("data/weights/popular.dill", "rb") as f:
+    model_popular = dill.load(f)
+
+random_model = Random()
 
 class RecoResponse(BaseModel):
     user_id: int
@@ -55,17 +67,19 @@ async def get_reco(
     user_id: int,
 ) -> RecoResponse:
     app_logger.info(f"Request for model: {model_name}, user_id: {user_id}")
+    k_recs = request.app.state.k_recs
 
     if model_name == "random":
-        reco = Random().predict([[user_id]])
+        reco = list(range(k_recs))
+    elif model_name == "popular":
+        reco = model_popular.predict([[user_id]])
+    elif model_name == "knn":
+        reco = model_knn.predict_online([[user_id]])
     else:
         raise ModelNotFoundError(error_message=f"Model {model_name} not found")
 
     if user_id > 10**9:
         raise UserNotFoundError(error_message=f"User {user_id} not found")
-
-    k_recs = request.app.state.k_recs
-    reco = list(range(k_recs))
     return RecoResponse(user_id=user_id, items=reco)
 
 
