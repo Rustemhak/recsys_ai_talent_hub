@@ -57,10 +57,10 @@ lint: isort flake mypy pylint
 
 # Test
 
-# .pytest:
-# 	poetry run pytest $(TESTS)
-#
-# test: .venv .pytest
+.pytest:
+	 PYTHONPATH="." poetry run pytest $(TESTS)
+
+test: .venv
 
 
 # Docker
