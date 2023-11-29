@@ -3,7 +3,7 @@ from implicit.nearest_neighbours import CosineRecommender, TFIDFRecommender
 
 class UserKnn_model_conf():
     model = TFIDFRecommender()
-    weight_path = 'data/weights/userknn_TFIDF.dill'
+    weight_path = 'data/weights/userknn_tfidf_50.dill'
     save_reco_df_path = 'data/offline_reco/userknn_TFIDF.csv'
     N_recs = 10
     online = False

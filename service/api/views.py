@@ -1,13 +1,13 @@
-import dill
 from typing import List
 
+import dill
 from fastapi import APIRouter, FastAPI, Request
 from pydantic import BaseModel
 
 from service.api.exceptions import ModelNotFoundError, UserNotFoundError
 from service.log import app_logger
 from service.ml_models import Random
-from config.config_models import UserKnn_model_conf, Popular_model_conf
+
 # Init models
 
 model_knn = None
@@ -19,6 +19,7 @@ with open("data/weights/popular.dill", "rb") as f:
     model_popular = dill.load(f)
 
 random_model = Random()
+
 
 class RecoResponse(BaseModel):
     user_id: int
