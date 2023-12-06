@@ -5,6 +5,8 @@ from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoin
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import Response
 
+from service.api.exceptions import UserNotAuthorized
+from service.config import SECRET_PHRASE
 from service.log import access_logger, app_logger
 from service.models import Error
 from service.response import server_error
@@ -17,6 +19,9 @@ class AccessMiddleware(BaseHTTPMiddleware):
         call_next: RequestResponseEndpoint,
     ) -> Response:
         started_at = time.perf_counter()
+        if f"Bearer {SECRET_PHRASE}" != request.headers.get("Authorization", ""):
+            print("In access middleware", request.headers.get("Authorization", ""))
+            raise UserNotAuthorized(error_message=f"User is not authorized: {request.headers.get('Authorization', '')}")
         response = await call_next(request)
         request_time = time.perf_counter() - started_at
 
