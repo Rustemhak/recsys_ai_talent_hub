@@ -58,9 +58,9 @@ lint: isort flake mypy pylint
 # Test
 
 .pytest:
-	poetry run pytest $(TESTS)
+	 PYTHONPATH="." poetry run pytest $(TESTS)
 
-test: .venv .pytest
+test: .venv
 
 
 # Docker
