@@ -18,6 +18,10 @@ model_popular = None
 with open("data/weights/popular.dill", "rb") as f:
     model_popular = dill.load(f)
 
+model_lightfm = None
+with open("data/weights/lightfm.dill", "rb") as f:
+    model_lightfm = dill.load(f)
+
 random_model = Random()
 
 
@@ -76,6 +80,8 @@ async def get_reco(
         reco = model_popular.predict([[user_id]])
     elif model_name == "knn":
         reco = model_knn.predict_online([[user_id]])
+    elif model_name == "lightfm":
+        reco = model_lightfm.predict([[user_id]])
     else:
         raise ModelNotFoundError(error_message=f"Model {model_name} not found")
 
