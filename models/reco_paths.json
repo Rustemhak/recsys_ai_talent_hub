@@ -1,0 +1,5 @@
+{
+    "ae_json":"data/offline_reco/AE.json",
+    "multi_vae_json":"data/offline_reco/MultiVAE.json",
+    "dssm_json":"data/offline_reco/DSSM.json"
+}

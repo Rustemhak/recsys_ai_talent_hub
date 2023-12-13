@@ -4,6 +4,7 @@ import dill
 from fastapi import APIRouter, FastAPI, Request
 from pydantic import BaseModel
 
+from models.nn_models import get_recos_AE, get_recos_DSSM, get_recos_multi_VAE
 from service.api.exceptions import ModelNotFoundError, UserNotFoundError
 from service.log import app_logger
 from service.ml_models import Random
@@ -82,6 +83,12 @@ async def get_reco(
         reco = model_knn.predict_online([[user_id]])
     elif model_name == "lightfm":
         reco = model_lightfm.predict([[user_id]])
+    elif model_name == "dssm":
+        reco = get_recos_DSSM(user_id, k_recs=k_recs)
+    elif model_name == "ae":
+        reco = get_recos_AE(user_id, k_recs=k_recs)
+    elif model_name == "multi_vae":
+        reco = get_recos_multi_VAE(user_id, k_recs=k_recs)
     else:
         raise ModelNotFoundError(error_message=f"Model {model_name} not found")
 
