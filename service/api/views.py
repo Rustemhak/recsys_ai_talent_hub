@@ -4,6 +4,7 @@ import dill
 from fastapi import APIRouter, FastAPI, Request
 from pydantic import BaseModel
 
+from models.hybrid import get_recos_hybrid
 from models.nn_models import get_recos_AE, get_recos_DSSM, get_recos_multi_VAE
 from service.api.exceptions import ModelNotFoundError, UserNotFoundError
 from service.log import app_logger
@@ -89,6 +90,8 @@ async def get_reco(
         reco = get_recos_AE(user_id, k_recs=k_recs)
     elif model_name == "multi_vae":
         reco = get_recos_multi_VAE(user_id, k_recs=k_recs)
+    elif model_name == "hybrid":
+        reco = get_recos_hybrid(user_id, k_recs=k_recs)
     else:
         raise ModelNotFoundError(error_message=f"Model {model_name} not found")
 
