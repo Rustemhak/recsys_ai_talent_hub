@@ -75,10 +75,7 @@ async def get_reco(
 ) -> RecoResponse:
     app_logger.info(f"Request for model: {model_name}, user_id: {user_id}")
     k_recs = request.app.state.k_recs
-
-    if model_name == "random":
-        reco = list(range(k_recs))
-    elif model_name == "popular":
+    if model_name == "popular":
         reco = model_popular.predict([[user_id]])
     elif model_name == "knn":
         reco = model_knn.predict_online([[user_id]])
